@@ -6,7 +6,7 @@
 Summary:	A Java date chooser bean for graphically picking a date
 Name:		%{name}
 Version:	1.4
-Release:	0
+Release:	1
 License:	LGPLv2+
 Group:		Development/Java
 URL:		http://toedter.com/%{name}
