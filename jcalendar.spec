@@ -58,13 +58,53 @@ rm -fr bin doc/api lib/*
 # pom.xml file
 cp %{SOURCE1} pom.xml
 
-# Add the META-INF/INDEX.LIST to the jar archive (fix jar-not-indexed warning)
-%pom_add_plugin :maven-jar-plugin . "
+# Bundle
+%pom_xpath_inject "pom:project" "<packaging>bundle</packaging>" .
+
+# Add an OSGi compilant MANIFEST.MF
+%pom_add_plugin org.apache.felix:maven-bundle-plugin "
+<extensions>true</extensions>
 <configuration>
-	<archive>
-		<index>true</index>
-	</archive>
-</configuration>"
+	<supportedProjectTypes>
+		<supportedProjectType>bundle</supportedProjectType>
+		<supportedProjectType>jar</supportedProjectType>
+	</supportedProjectTypes>
+	<instructions>
+		<Bundle-Name>\${project.artifactId}</Bundle-Name>
+		<Bundle-Version>\${project.version}</Bundle-Version>
+	</instructions>
+</configuration>
+<executions>
+	<execution>
+		<id>bundle-manifest</id>
+		<phase>process-classes</phase>
+		<goals>
+			<goal>manifest</goal>
+		</goals>
+	</execution>
+</executions>"
+
+# Add the META-INF/INDEX.LIST (fix jar-not-indexed warning) and
+# the META-INF/MANIFEST.MF to the jar archive
+%pom_add_plugin :maven-jar-plugin . "
+<executions>
+	<execution>
+		<phase>package</phase>
+		<configuration>
+			<archive>
+				<manifestFile>\${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+				<manifest>
+					<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+					<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+				</manifest>
+				<index>true</index>
+			</archive>
+		</configuration>
+		<goals>
+			<goal>jar</goal>
+		</goals>
+	</execution>
+</executions>"
 
 # Fix the sources path
 %pom_xpath_inject "pom:project/pom:build" "<sourceDirectory>src</sourceDirectory>" .
