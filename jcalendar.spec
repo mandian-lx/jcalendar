@@ -62,7 +62,7 @@ cp %{SOURCE1} pom.xml
 %pom_xpath_inject "pom:project" "<packaging>bundle</packaging>" .
 
 # Add an OSGi compilant MANIFEST.MF
-%pom_add_plugin org.apache.felix:maven-bundle-plugin "
+%pom_add_plugin org.apache.felix:maven-bundle-plugin . "
 <extensions>true</extensions>
 <configuration>
 	<supportedProjectTypes>
